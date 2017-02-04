@@ -1,9 +1,13 @@
 from PIL import Image
 from numpy import *
 import requests
+from pymongo import MongoClient
+import MongoURI
+import base64
+from io import BytesIO
 
-class processor:
-	def __init__(self, desiredSize = (400, 400)):
+class Processor:
+	def __init__(self, desiredSize = (300, 300)):
 		self._desiredSize = desiredSize
 	
 	@staticmethod
@@ -17,11 +21,21 @@ class processor:
 	def _imgToArray(self, image):
 		return asarray(image, dtype = uint8).T
 	
+	def _arrayToString(self, imgArray):
+		return imgArray.tostring()
+	
 	def _matchImgToLabels(self, images, labels):
-		matchedResult = dict()
+		imageList = list()
 		for (img, label) in zip(images, labels):
-			matchedResult[img] = labels 
-		return matchedResult
+			matchedResult = dict()
+			imgData = self._imgToArray(img)
+			shape = imgData.shape
+			print(shape)
+			matchedResult['img'] = self._arrayToString(imgData)
+			matchedResult['label'] = label
+			matchedResult['shape'] = shape
+			imageList.append(matchedResult)
+		return imageList
 	
 	def _saveToServer(self, images, labels):
 		#connect to the server
@@ -35,9 +49,24 @@ class processor:
 	def _scaleImg(self, img, size = None):
 		if size is None:
 			size = self._desiredSize
-		return img.thumbnail(size, Image.ANTIALIAS)	
+		return img.resize(size, Image.LANCZOS)
+
+	def _decodeImage(self, img):
+		return Image.open(BytesIO(base64.b64decode(img)))
 	
-	def processImgs(self, images, labels):
+	def processImgAtServer(self, image, label):
+		if type(image) == str:
+			image = self._decodeImage(image)
+		if (image.width, image.height) != self._desiredSize:
+			image = self._scaleImg(image)
+		imageBuffer = BytesIO()
+		image.save(imageBuffer, format = "JPEG")
+		imageString = base64.encodestring(imageBuffer.getvalue()).strip()
+		client = MongoClient(MongoURI.uri)
+		cursor = client.heroku_pl2gkfc9
+		cursor.imageLibrary.insert({'img': imageString, 'label': label})
+	
+	def processImgsAtLocal(self, images, labels):
 		if len(images) != len(labels):
 			raise ValueError
 		for index, img in enumerate(images):
