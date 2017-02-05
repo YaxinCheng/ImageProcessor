@@ -2,7 +2,7 @@ from PIL import Image
 from numpy import *
 import requests
 from pymongo import MongoClient
-import MongoURI
+from Connections import MongoDB
 import base64
 from io import BytesIO
 
@@ -62,9 +62,8 @@ class Processor:
 		imageBuffer = BytesIO()
 		image.save(imageBuffer, format = "JPEG")
 		imageString = base64.encodestring(imageBuffer.getvalue()).strip()
-		client = MongoClient(MongoURI.uri)
-		cursor = client.heroku_pl2gkfc9
-		cursor.imageLibrary.insert({'img': imageString, 'label': label})
+		mongodb = MongoDB()
+		mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label})
 	
 	def processImgsAtLocal(self, images, labels):
 		if len(images) != len(labels):

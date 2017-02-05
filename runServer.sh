@@ -1,3 +1,3 @@
 #/bin/sh
 
-gunicorn ArcheryHelper:app
+gunicorn main:app
