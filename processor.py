@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from Connections import MongoDB
 import base64
 from io import BytesIO
+#
 
 class Processor:
 	def __init__(self, desiredSize = (300, 300)):
