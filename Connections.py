@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 class MongoDB:
-	uri = 'mongodb://heroku_pl2gkfc9:uph4v7gjr1jr58qqo5pr42lumv@ds161038.mlab.com:61038/heroku_pl2gkfc9'
+	uri = 'mongodb://heroku_glcz6m5s:s9aov2qcf0abptsradc630bc3v@ds143559.mlab.com:43559/heroku_glcz6m5s'
 	def __init__(self):
 		self._client = MongoClient(MongoDB.uri)
-		self.cursor = self._client.heroku_pl2gkfc9
+		self.cursor = self._client.heroku_glcz6m5s
