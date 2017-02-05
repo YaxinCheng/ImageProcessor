@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
 import json
-from Processor import *
+from processor import *
 from ImageExporter import *
 
 def getJSON(request):
