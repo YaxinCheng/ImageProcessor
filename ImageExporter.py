@@ -5,12 +5,11 @@ from io import BytesIO
 from numpy import *
 
 class ImageExporter:
-	def __init__(self, rotateAngle = 45, compressToSize = None):
-		self._rotateAngle = rotateAngle
+	def __init__(self, compressToSize = None):
 		self._size = compressToSize
 
-	def _rotate(self, image):
-		return image.rotate(self._rotateAngle)
+	def _rotate(self, image, angle):
+		return image.rotate(angle)
 	
 	def _imgToArray(self, image):
 		return array(image).T
@@ -34,14 +33,15 @@ class ImageExporter:
 		for each in imagePackage:
 			try:
 				eachImg = each['img']
-				img = self._decodeImage(eachImg)
+				originalImg = self._decodeImage(eachImg)
+				img = originalImg
 				label = list(map(lambda x: int(x), each['label'].split(',')))
-				for _ in range(8):
+				for angle in range(0, 361, 45):
 								try:
 									imgData = self._imgToArray(img) 
 									images.append(imgData.tolist())
 									labels.append(label) 
-									img = self._rotate(img)
+									img = self._rotate(originalImg, angle = angle)
 								except:
 									continue
 			except:
