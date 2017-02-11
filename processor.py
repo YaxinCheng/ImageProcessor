@@ -36,4 +36,5 @@ class Processor:
 			image = self._scaleImg(image)
 		imageString = self._encodeImage(image)
 		mongodb = MongoDB()
-		mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label}) 
+		print('before inserting')
+		return mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label})
