@@ -1,11 +1,10 @@
 from PIL import Image
 from numpy import *
 import requests
-from pymongo import MongoClient
 from Connections import MongoDB
 import base64
 from io import BytesIO
-#
+from bson.objectid import ObjectId
 
 class Processor:
 	def __init__(self, desiredSize = (300, 300)):
@@ -30,14 +29,17 @@ class Processor:
 		return base64.encodestring(imageBuffer.getvalue())
 	
 	def processImgAtServer(self, image, label, mode, id):
-		if type(image) == str:
-			image = self._decodeImage(image)
-		if (image.width, image.height) != self._desiredSize:
-			image = self._scaleImg(image)
-		imageString = self._encodeImage(image)
+		if mode == 'insert':
+			if type(image) == str:
+				image = self._decodeImage(image)
+			if (image.width, image.height) != self._desiredSize:
+				image = self._scaleImg(image)
+			imageString = self._encodeImage(image)
 		mongodb = MongoDB()
 		if mode == 'insert':
 			return mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label})
 		elif mode == 'update':
-			mongodb.cursor.imageLibrary.update({'_id': id}, {'$set': {'label': label}})
-			return id	
+			mongodb.cursor.imageLibrary.update({'_id': ObjectId(id)}, {'$set': {'label': label}})
+			return 'Success'	
+		else:
+			return "Unknown request"
