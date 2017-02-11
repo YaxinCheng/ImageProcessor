@@ -29,12 +29,15 @@ class Processor:
 		img.save(imageBuffer, format = "JPEG")
 		return base64.encodestring(imageBuffer.getvalue())
 	
-	def processImgAtServer(self, image, label):
+	def processImgAtServer(self, image, label, mode, id):
 		if type(image) == str:
 			image = self._decodeImage(image)
 		if (image.width, image.height) != self._desiredSize:
 			image = self._scaleImg(image)
 		imageString = self._encodeImage(image)
 		mongodb = MongoDB()
-		print('before inserting')
-		return mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label})
+		if mode == 'insert':
+			return mongodb.cursor.imageLibrary.insert({'img': imageString, 'label': label})
+		elif mode == 'update':
+			mongodb.cursor.imageLibrary.update({'_id': id}, {'$set': {'label': label}})
+			return id	

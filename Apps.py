@@ -16,8 +16,7 @@ class imageCollector(Resource):
 		content = getJSON(request)
 		processor = Processor()
 		try:
-			id = processor.processImgAtServer(image = content['img'], label = content['label'])
-			print(id)
+			id = processor.processImgAtServer(image = content['img'], label = content['label'], mode = content['mode'], id = content['id'])
 		except:
 			return {'Result': 'Failed processing image'} 
 		return {'Result': str(id)}
