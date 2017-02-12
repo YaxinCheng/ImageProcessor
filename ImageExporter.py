@@ -36,7 +36,7 @@ class ImageExporter:
 				originalImg = self._decodeImage(eachImg)
 				img = originalImg
 				label = list(map(lambda x: int(x), each['label'].split(',')))
-				for angle in range(0, 361, 45):
+				for angle in range(0, 361, 90):
 								try:
 									imgData = self._imgToArray(img) 
 									images.append(imgData.tolist())
