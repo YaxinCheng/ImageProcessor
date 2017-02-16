@@ -1,18 +1,36 @@
 from flask_restful import Resource
-from flask import request
+from flask import stream_with_context, request, Response
 import json
 from processor import *
 from ImageExporter import *
 from Connections import MongoDB
 from bson.objectid import ObjectId
+import pymongo
+from six.moves import cPickle as pickle
+from io import BytesIO
 
 def getJSON(request):
 	return json.loads(json.dumps(request.get_json(force = True)))	
 
 class imageCollector(Resource):
 	def get(self):
-		imgExporter = ImageExporter()
-		return json.dumps(imgExporter.downloadImagesFromServer())
+		def generate():
+			db = MongoDB()
+			cursor = db.cursor.imageLibrary.find({})
+			dataset = dict()
+			dataset['images'] = list()
+			dataset['labels'] = list()
+			while cursor.alive:
+				for imagePackage in cursor:
+					img, label = imagePackage['img'], imagePackage['label']
+					exporter = ImageExporter(image = img, label = label)
+					images, labels = exporter.downloadImagesFromServer()
+					dataset['images'] += images
+					dataset['labels'] += labels
+				pickleBuffer = BytesIO()
+				pickle.dump(dataset, pickleBuffer, pickle.HIGHEST_PROTOCOL)
+				yield pickleBuffer.getvalue()
+		return Response(stream_with_context(generate()), mimetype = 'application/pickle', headers = {'Content-Disposition': 'attachment; filename=data.pickle', 'Content-type': 'application/pickle'})
 
 	def post(self):
 		content = getJSON(request)
@@ -29,3 +47,4 @@ class imageCollector(Resource):
 		db = MongoDB()
 		db.cursor.imageLibrary.remove({'_id': ObjectId(content['_id'])})
 		return {'Result': 'Removed'}
+

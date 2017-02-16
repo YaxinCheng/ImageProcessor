@@ -5,8 +5,9 @@ from io import BytesIO
 from numpy import *
 
 class ImageExporter:
-	def __init__(self, compressToSize = None):
-		self._size = compressToSize
+	def __init__(self, image, label):
+		self._image = image
+		self._label = label
 
 	def _rotate(self, image, angle):
 		return image.rotate(angle)
@@ -19,37 +20,29 @@ class ImageExporter:
 			size = self._desiredSize
 		return img.resize(size, Image.LANCZOS)
 	
-	def _decodeImage(self, img):
-		return Image.open(BytesIO(base64.b64decode(img)))
+	def _decodeImage(self):
+		return Image.open(BytesIO(base64.b64decode(self._image)))
 
 	def _encodeImage(self, img):
 		imageBuffer = BytesIO()
 		img.save(imageBuffer, format = "JPEG")
 		return base64.encodestring(imageBuffer.getvalue())
 	
-	def _processImage(self, imagePackage):
+	def _processImage(self):
 		images = list()
 		labels = list()
-		for each in imagePackage:
+		originalImg = self._decodeImage()
+		img = originalImg
+		for angle in range(0, 361, 90):
 			try:
-				eachImg = each['img']
-				originalImg = self._decodeImage(eachImg)
-				img = originalImg
-				label = list(map(lambda x: int(x), each['label'].split(',')))
-				for angle in range(0, 361, 90):
-								try:
-									imgData = self._imgToArray(img) 
-									images.append(imgData.tolist())
-									labels.append(label) 
-									img = self._rotate(originalImg, angle = angle)
-								except:
-									continue
+				imgData = self._imgToArray(img) 
+				images.append(imgData)
+				labels.append(self._label) 
+				img = self._rotate(originalImg, angle = angle)
 			except:
 				continue
-		return [ images, labels] 
+		return  (images, labels) 
 		 
 	def downloadImagesFromServer(self):
-		mongodb = MongoDB()
-		imgPackage = mongodb.cursor.imageLibrary.find({}) 
-		return self._processImage(imgPackage)
+		return self._processImage()
 	
