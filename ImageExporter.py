@@ -36,7 +36,7 @@ class ImageExporter:
 		flipped = originalImg.transpose(Image.FLIP_LEFT_RIGHT)
 		for eachImg in [img, flipped]:
 			img = eachImg
-			for angle in range(0, 361, 90):
+			for angle in range(0, 360, 90):
 				try:
 					imgData = self._imgToArray(img) 
 					images.append(imgData)
