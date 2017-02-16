@@ -10,12 +10,7 @@ def output_json(obj, code, headers = None):
 	resp.headers.extend(headers or {})
 	return resp
 
-def download_pickle(obj, code, headers = None):
-	resp = make_response(obj,  code)
-	resp.headers.extend(headers or {})
-	return resp
-
-api.representations = {'application/json': output_json, 'application/pickle': download_pickle}
+api.representations = {'application/json': output_json}
 
 api.add_resource(Apps.imageCollector, '/')
 

@@ -7,7 +7,6 @@ from Connections import MongoDB
 from bson.objectid import ObjectId
 import pymongo
 from six.moves import cPickle as pickle
-from io import BytesIO
 from numpy import *
 
 def getJSON(request):
@@ -26,9 +25,7 @@ class imageCollector(Resource):
 					images, labels = exporter.downloadImagesFromServer()
 					dataset['images'] = array(images)
 					dataset['labels'] = array(labels)
-					pickleBuffer = BytesIO()
-					pickle.dump(dataset, pickleBuffer, pickle.HIGHEST_PROTOCOL)
-					yield pickleBuffer.getvalue()
+					yield pickle.dumps(dataset, pickle.HIGHEST_PROTOCOL)
 		return Response(stream_with_context(generate()), mimetype = 'application/pickle', headers = {'Content-Disposition': 'attachment; filename=data.pickle', 'Content-type': 'application/pickle'})
 
 	def post(self):
