@@ -34,15 +34,15 @@ class imageCollector(Resource):
 		try:
 			id = processor.processImgAtServer(image = content['img'], label = content['label'], mode = content['mode'], id = content['id'])
 		except:
-			return json.dumps({'Result': 'Failed processing image'} )
-		return json.dumps({'Result': str(id)})
+			return {'Result': 'Failed processing image'} 
+		return {'Result': str(id)}
 	
 	def put(self):
 		content = getJSON(request)
 		print(content)
 		db = MongoDB()
 		db.cursor.imageLibrary.remove({'_id': ObjectId(content['_id'])})
-		return json.dumps({'Result': 'Removed'})
+		return {'Result': 'Removed'}
 
 '''
 		def generate():
