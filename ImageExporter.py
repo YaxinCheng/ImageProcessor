@@ -33,14 +33,17 @@ class ImageExporter:
 		labels = list()
 		originalImg = self._decodeImage()
 		img = originalImg
-		for angle in range(0, 361, 90):
-			try:
-				imgData = self._imgToArray(img) 
-				images.append(imgData)
-				labels.append(self._label) 
-				img = self._rotate(originalImg, angle = angle)
-			except:
-				continue
+		flipped = originalImg.transpose(Image.FLIP_LEFT_RIGHT)
+		for eachImg in [img, flipped]:
+			img = eachImg
+			for angle in range(0, 361, 90):
+				try:
+					imgData = self._imgToArray(img) 
+					images.append(imgData)
+					labels.append(self._label) 
+					img = self._rotate(img, angle = angle)
+				except:
+					continue
 		return  (images, labels) 
 		 
 	def downloadImagesFromServer(self):

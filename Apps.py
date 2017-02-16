@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 import pymongo
 from six.moves import cPickle as pickle
 from io import BytesIO
+from numpy import *
 
 def getJSON(request):
 	return json.loads(json.dumps(request.get_json(force = True)))	
@@ -27,6 +28,8 @@ class imageCollector(Resource):
 					images, labels = exporter.downloadImagesFromServer()
 					dataset['images'] += images
 					dataset['labels'] += labels
+				dataset['images'] = array(dataset['images'])
+				dataset['labels'] = array(dataset['labels'])
 				pickleBuffer = BytesIO()
 				pickle.dump(dataset, pickleBuffer, pickle.HIGHEST_PROTOCOL)
 				yield pickleBuffer.getvalue()
