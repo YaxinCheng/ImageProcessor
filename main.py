@@ -13,7 +13,6 @@ def output_json(obj, code, headers = None):
 def download_pickle(obj, code, headers = None):
 	resp = make_response(obj,  code)
 	resp.headers.extend(headers or {})
-	pickleBuffer.close()
 	return resp
 
 api.representations = {'application/json': output_json, 'application/pickle': download_pickle}
