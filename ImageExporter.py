@@ -13,7 +13,7 @@ class ImageExporter:
 		return image.rotate(angle)
 	
 	def _imgToArray(self, image):
-		return array(image).T
+		return array(image)
 	
 	def _scaleImg(self, img, size = None):
 		if size is None:
