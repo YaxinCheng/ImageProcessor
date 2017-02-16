@@ -28,8 +28,8 @@ class imageCollector(Resource):
 					images, labels = exporter.downloadImagesFromServer()
 					dataset['images'] += images
 					dataset['labels'] += labels
-				dataset['images'] = array(dataset['images'])
-				dataset['labels'] = array(dataset['labels'])
+				#dataset['images'] = array(dataset['images'])
+				#dataset['labels'] = array(dataset['labels'])
 				pickleBuffer = BytesIO()
 				pickle.dump(dataset, pickleBuffer, pickle.HIGHEST_PROTOCOL)
 				yield pickleBuffer.getvalue()
