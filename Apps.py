@@ -16,16 +16,15 @@ class imageCollector(Resource):
 	def get(self):
 		def generate():
 			db = MongoDB()
-			cursor = db.cursor.imageLibrary.find({})
+			cursor = db.cursor.imageLibrary.find({'label': {'$ne': '0,0,0,0,0,0,0,0,0,0,0,0'}})
 			dataset = dict()
 			while cursor.alive:
 				for imagePackage in cursor:
 					img, label = imagePackage['img'], imagePackage['label']
 					exporter = ImageExporter(image = img, label = label)
 					images, labels = exporter.downloadImagesFromServer()
-					dataset['images'] = array(images)
-					dataset['labels'] = array(labels)
-					yield pickle.dumps(dataset, pickle.HIGHEST_PROTOCOL)
+					for image, label in zip(images, labels):
+						yield pickle.dumps((image, label), pickle.HIGHEST_PROTOCOL)
 		return Response(stream_with_context(generate()), mimetype = 'application/pickle', headers = {'Content-Disposition': 'attachment; filename=data.pickle', 'Content-type': 'application/pickle'})
 
 	def post(self):
