@@ -17,7 +17,6 @@ class imageCollector(Resource):
 		def generate():
 			db = MongoDB()
 			cursor = db.cursor.imageLibrary.find({'label': {'$ne': '0,0,0,0,0,0,0,0,0,0,0,0'}})
-			dataset = dict()
 			while cursor.alive:
 				for imagePackage in cursor:
 					img, label = imagePackage['img'], imagePackage['label']
@@ -43,23 +42,3 @@ class imageCollector(Resource):
 		db.cursor.imageLibrary.remove({'_id': ObjectId(content['_id'])})
 		return {'Result': 'Removed'}
 
-'''
-		def generate():
-			db = MongoDB()
-			cursor = db.cursor.imageLibrary.find({})
-			dataset = dict()
-			dataset['images'] = list()
-			dataset['labels'] = list()
-			while cursor.alive:
-				for imagePackage in cursor:
-					img, label = imagePackage['img'], imagePackage['label']
-					exporter = ImageExporter(image = img, label = label)
-					images, labels = exporter.downloadImagesFromServer()
-					dataset['images'] += images
-					dataset['labels'] += labels
-				dataset['images'] = array(dataset['images'])
-				dataset['labels'] = array(dataset['labels'])
-				pickleBuffer = BytesIO()
-				pickle.dump(dataset, pickleBuffer, pickle.HIGHEST_PROTOCOL)
-				yield pickleBuffer.getvalue()
-				'''
