@@ -34,13 +34,14 @@ class ImageExporter:
 		originalImg = self._decodeImage()
 		img = originalImg
 		flipped = originalImg.transpose(Image.FLIP_LEFT_RIGHT)
+		label = array(list(map(lambda element: uint8(element), self._label.split(','))))
 		for eachImg in [img, flipped]:
 			img = eachImg
 			for angle in range(0, 360, 90):
 				try:
 					imgData = self._imgToArray(img) 
 					images.append(imgData)
-					labels.append(self._label) 
+					labels.append(label) 
 					img = self._rotate(img, angle = angle)
 				except:
 					continue
